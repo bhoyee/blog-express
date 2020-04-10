@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const {Post} = require('../db/models/Post');
 
 
@@ -25,9 +24,6 @@ router.post('/:id', async (req, res)=> {
         
          console.log('something is wrong ' + err);
        }
-    
-
-    
 })
 
 module.exports = router;

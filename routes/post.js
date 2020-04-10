@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Post } = require('../db/models/Post');
-const auth = require('../middleware/auth');
+
 
 
 router.get('/',  async (req, res) => {
@@ -11,7 +11,7 @@ router.get('/',  async (req, res) => {
         const posts = await Post.find().sort('-createdAt')
         console.log(name)
         res.render('index', { posts, name });  
-     //  res.render('index', { posts});
+
     }
     catch(err) {
         console.log('Something go wrong.. error: ' + err)
@@ -35,7 +35,6 @@ router.get('/:id',  async (req, res) => {
               
           }
        
-     //  res.render('index', { posts});
     }
     catch(err) {
         console.log('Something go wrong.. error: ' + err)
@@ -58,9 +57,7 @@ router.get('/posts/edit/:id',  async (req, res) => {
             res.render('page404');
            
         }
-      
-        
-     //  res.render('index', { posts});
+   
     }
     catch(err) {
         console.log('Something go wrong.. error: ' + err)

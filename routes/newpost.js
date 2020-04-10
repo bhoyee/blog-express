@@ -36,14 +36,12 @@ router.post('/', (req, res)=> {
         })
      }
         else {
-          return res.send('file no supported')           
+          return res.send('file not supported')           
         }
 
     }
     catch(error) {
 
-        console.log('something went wrong ' + error);
-        
         const postErrors = Object.keys(error.errors).map(key => error.errors[key].message)
  
         req.flash('loginErrors', postErrors)

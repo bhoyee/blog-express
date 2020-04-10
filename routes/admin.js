@@ -2,17 +2,16 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const { Post }= require('../db/models/Post');
-const { User }= require('../db/models/User');
+
 
 
 
 router.get('/', auth, async (req, res) => {
     try {
          let name = req.session.name;
-        const posts = await Post.find().sort('-createdAt')
-       // res.render('index', { posts, name });  
-       res.render('dashboard', { posts, name, 
-        errors: req.flash('loginErrors')
+         const posts = await Post.find().sort('-createdAt')
+         res.render('dashboard', { posts, name, 
+         errors: req.flash('loginErrors')
     });
     }
     catch(err) {
