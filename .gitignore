@@ -1,4 +1,7 @@
 /node_modules
 /pages
 /theme
+/git
+/Desktop
+*.pub
 
