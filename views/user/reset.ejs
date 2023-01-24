@@ -1,0 +1,57 @@
+<%- include("../layouts/header"); -%>
+
+<!-- Page Header -->
+<header class="masthead">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="page-heading">
+          <h1>Reset Password</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+        <% if (successMsg.length > 0) { %>
+
+            <ul>
+              <% successMsg.forEach(function(success){ %>
+                <li class="list-group-item text-center bg-success text-white"><%= success %></li>
+              
+              <% }); %>
+          
+              <%} else if(errors.length > 0){ %>
+                <ul>
+                    <% errors.forEach(function(error){ %>
+                      <li class="list-group-item text-white text-center bg-danger"><%= error%></li>
+                    
+                    <% }); %>
+                </ul>
+                <% } %>
+    
+      <form action="/auth/reset" method="POST" encType="multipart/form-data">
+        <div class="control-group">
+          <div class="form-group floating-label-form-group controls">
+            <label>Email</label>
+            <input type="email" name="email" required placeholder="Enter You Email Address" class="form-control">
+          </div>
+        </div>
+              
+        <div class="form-group my-4 text-center">
+
+          <button class="btn btn-primary">Reset Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<%- include("../layouts/footer"); -%>

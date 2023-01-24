@@ -7,8 +7,7 @@ const postSchema = new mongoose.Schema({
     author: String,
     image: String,
     createdAt: {
-        type: Date,
-       
+        type: Date,  
         default: Date.now
     }
 })

@@ -9,6 +9,7 @@
         <div class="site-heading">
           <h1>30 Day Challenge</h1>
           <span class="subheading">Join Me In My Tabaka Challenge!</span>
+  
         </div>
       </div>
     </div>
@@ -18,11 +19,14 @@
 <!-- Main Content -->
 <div class="container">
   <div class="row">
+   
+    <% if (posts.length > 0) { %>
     <div class="col-lg-9 col-md-10 mx-auto">
-     <%  posts.forEach(function(post){ %>
+      <% for (let post of posts) { %>
+    
       
         <div class="post-preview">
-          <a href="/post/<%=post._id%>">
+          <a href="/post/<%=post.title%>-<%=post._id%>">
             <h2 class="post-title">
                 <%=post.title%>
             
@@ -30,22 +34,43 @@
           </a>
            <p class="post-meta">Posted by
            <a href="#"><%=post.author%></a>
-           on <%=post.createdAt.toDateString()%>
+           on <%= post.createdAt.toDateString() %>
        
           </p>
           <p class="post-preview" >
-            <%=post.content.substring(0,150) + "..."%> 
+            <%- post.content.substring(0, 150) + " ..." %> 
             
-            <em> <a href="/post/<%=post._id%>" class="btn btn-dark btn-sm">Read more </a>
+            <em> <a href="/post/<%=post.title%>-<%= post._id %>" class="btn btn-dark btn-sm">Read more </a>
             </p> </em>
         </div>
         <hr>
-        <% }) %>
-      <!-- Pager -->
-      <div class="clearfix">
-        <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+        <% } %>
+        
+      <!-- Pagination -->
+      <div class="clearfix  ">
+        <div class="row">
+          <div class="col-sm ">
+          <% if (currentPage != 1 && previousPage != 1) { %> 
+            <a class="btn btn-primary float-left ml-3 text-capitalize" href="/?page=1">newest</a>
+          <% } %>
+          <% if (hasPreviousPage) { %> 
+            <a class="btn btn-primary float-left ml-3 text-capitalize" href="/?page=<%= previousPage %>">prev</a>
+          <% } %>
+            <a class="btn btn-primary float-left active ml-3 text-capitalize" href="/?page=<%= currentPage %>">current</a>
+          <% if (hasNextPage) { %> 
+            <a class="btn btn-primary float-left ml-3 mt-3 mt-md-0 text-capitalize" href="/?page=<%= nextPage %>">next</a>
+          <% } %>
+          <% if (lastPage !== currentPage && nextPage !== lastPage) { %> 
+             <a class="btn btn-primary float-left ml-3 mt-3 mt-lg-0  text-capitalize" href="/?page=<%= lastPage %>">last</a>
+          <% } %>
+          </div>
+        </div>
+
       </div>
     </div>
+    <% } else { %>
+      <h1>No Posts Found!</h1>
+      <% } %>
   </div>
 </div>
  

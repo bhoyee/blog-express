@@ -1,0 +1,432 @@
+<%- include("../layouts/header"); -%>
+<!-- includes the Braintree JS client SDK -->
+<script src="https://js.braintreegateway.com/web/dropin/1.23.0/js/dropin.min.js"></script>
+
+<!-- includes jQuery -->
+<script src="http://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+
+<!-- Page Header -->
+<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="page-heading">
+            <h1>Check out</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+        <!-- paypal integration -->
+       <div>
+
+        <script
+          src="https://www.paypal.com/sdk/js?client-id=ARkkV-B38NDpcXrXwzoT91xnsARrU0wnzBARPhOUJeqY0bICk9S-_JPqUUmsOE_qjdyVKj-GR0AXv_Jq"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+        </script>
+
+
+        <script>
+          paypal.Buttons({
+            createOrder: function(data, actions) {
+              // This function sets up the details of the transaction, including the amount and line item details.
+              return actions.order.create({
+                purchase_units: [{
+                  amount: {
+                    value: '<%= totalSum %>'
+                  }
+                }]
+              });
+            },
+            onApprove: function(data, actions) {
+              // This function captures the funds from the transaction.
+              return actions.order.capture().then(function(details) {
+                // This function shows a transaction success message to your buyer.
+               
+                alert('Transaction completed by ' + details.payer.name.given_name);
+                console.log('Transaction status ' + details.payer.name.surname);
+                console.log('Transaction status ' + details.payer.email_address);
+                console.log('Order status paymnt ' + details.purchase_units.payments);
+                 console.log('Order status ' + details.purchase_units);
+                 console.log('Order status ' + details.status + '' + details.id);
+                console.log('Transaction  ' + JSON.stringify(details));
+                window.location = '/shop/pin';
+              });
+            },
+           
+    
+          }).render('#paypal-button-container');
+          //This function displays Smart Payment Buttons on your web page.
+        </script>
+       
+       </div> 
+
+ <div class="container">
+  <div class="row">
+    <div class="col-md-4 order-md-2 mb-4">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">Payment</span>
+      </h4>
+ 
+     
+      <ul class="list-group mb-3 accordion"  id="payment">
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div class="custom-control custom-radio w-100 card-header" id="headingOne">
+            <input id="credit" name="cardMethod" type="radio" class="custom-control-input" data-toggle="collapse" href="#cardPayment" aria-expanded="true" aria-controls="cardPayment" checked required>
+            <label class="custom-control-label" for="credit">Debit / Credit card</label>
+            <div class="collapse show " id="cardPayment" aria-labelledby="headingOne" data-parent="#payment">
+              <div class="card card-body mt-3">
+
+               
+             
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                    Pay Now
+                  </button>
+                  
+
+                <!--Start Card Payment Modal -->
+                  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Payment Details</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                               <!-- Credit card form content -->
+
+                                  <!-- start err handling -->
+                                  <% if (successMsg.length > 0) { %>
+
+                                    <ul>
+                                      <% successMsg.forEach(function(success){ %>
+                                        <!-- <li class="list-group-item text-center bg-success text-white"></li> -->
+                                        <span class="alert alert-success " id="Alart"><%= success %></span>
+                                      
+                                      <% }); %>
+                                  
+                                      <%} else if(errors.length > 0){ %>
+                                        <ul>
+                                            <% errors.forEach(function(error){ %>
+                                              <!-- <li class="list-group-item text-white text-center bg-danger"></li> -->
+                                              <span class="alert alert-danger " id="Alart2"><%= error%></span>
+                                            
+                                            <% }); %>
+                                        </ul>
+                                     <% } %>
+                                     <!-- end err handling -->                            
+                                     <div id="dropin-wrapper">
+                                      <div id="checkout-message"></div>
+                                      <div id="dropin-container"></div>
+                                      <button id="submit-button" class="btn btn-outline-primary">Submit payment</button>
+                                    </div>
+                                    <script>
+                                      var button = document.querySelector('#submit-button');
+                                    
+                                      braintree.dropin.create({
+                                        // Insert your tokenization key here
+                                        authorization: 'sandbox_fwgj7mp5_qqf7w5vkzmrs7ncy',
+                                        container: '#dropin-container',
+                                       
+                                      }, function (createErr, instance) {
+                                        button.addEventListener('click', function () {
+                                          instance.requestPaymentMethod(function (requestPaymentMethodErr, payload) {
+                                            // When the user clicks on the 'Submit payment' button this code will send the
+                                            // encrypted payment information in a variable called a payment method nonce
+                                            $.ajax({
+                                              type: 'POST',
+                                              url: '/checkout',
+                                              data: {'paymentMethodNonce': payload.nonce}
+                                            }).done(function(result) {
+                                              // Tear down the Drop-in UI
+                                              instance.teardown(function (teardownErr) {
+                                                if (teardownErr) {
+                                                  console.error('Could not tear down Drop-in UI!');
+                                                } else {
+                                                  console.info('Drop-in UI has been torn down!');
+                                                  // Remove the 'Submit payment' button
+                                                  $('#submit-button').remove();
+                                                }
+                                              });
+                                    
+                                              if (result.success) {
+                                                $('#checkout-message').html('<h1>Success</h1><p>Your Drop-in UI is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p>');
+                                              } else {
+                                                console.log(result);
+                                                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+                                              }
+                                            });
+                                          });
+                                        });
+                                      });
+                                    </script>
+                                
+                                <!-- End --> 
+                               
+                              <div class="modal-footer">
+                                <span><em style="font-size: 10px;">power by <a href="https://braintreepayments.com/">Braintree Payments</a> </em></span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                                  <!-- End card Payment Modal -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+    
+         
+        </li>
+        
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div class="custom-control custom-radio" id="headingTwo">
+            <input id="paypal" name="paypalMethod" type="radio" class="custom-control-input collapsed" data-toggle="collapse" href="#paypalPayment" aria-expanded="false" aria-controls="paypalPayment" required>
+            <label class="custom-control-label" for="paypal">Paypal</label>
+            <div class="collapse" id="paypalPayment" aria-labelledby="headingTwo" data-parent="#payment">
+              <div class="card card-body mt-3">
+                <div id="paypal-button">
+
+                  <div id="paypal-button-container">PayNow</div>
+                  
+                  <!-- <button type="submit" id="paypal-button">paypal</button> -->
+                </div> 
+           
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div class="custom-control custom-radio" id="headingThree">
+            <input id="debit" name="cryptoMethod" type="radio" class="custom-control-input" data-toggle="collapse" href="#cryptoPayment" aria-expanded="false" aria-controls="cryptoPayment" required>
+            <label class="custom-control-label" for="debit">Cryptocurrency</label>
+            <div class="collapse" id="cryptoPayment" aria-labelledby="headingThree" data-parent="#payment">
+              <div class="card card-body mt-3">
+                <form >
+                  
+                  <button type="button" id="crypto" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="#myModal">Pay with Crypto</button>
+                  
+                  <!-- Trigger when network bad -->
+                   <!-- <button class="btn btn-primary" id="btnSpinner" type="button" disabled  >
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>
+                    Loading...
+                  </button> -->
+              </form> 
+              <!-- <form action="/cryptoPay" method="post">
+              <button type="submit" class="btn btn-primary">test</button>
+              </form> -->
+
+              </div>
+            </div>
+          </div>
+        </li>
+      
+      </ul>
+
+    </div>
+    
+    <div class="col-md-8 order-md-1">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">Your cart</span>
+        <span class="badge badge-secondary badge-pill"><%= cart %></span>
+        
+      </h4>
+      <form class="needs-validation" novalidate>
+        <ul class="list-group mb-3">
+          <% products.forEach(p => { %>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0"><%= p.productId.title %></h6>
+                <small class="text-muted">Quantity (x) :  <%= p.quantity %> </small>
+              </div>
+      
+              <span class="text-muted">$ <%= p.quantity * p.productId.price  %></span>
+              
+            </li>
+          <% }) %>
+        
+          <li class="list-group-item d-flex justify-content-between bg-light">
+            <div class="text-success">
+              <h6 class="my-0">Shipping</h6>
+              <small>EXAMPLECODE</small>
+            </div>
+            <span class="text-success">$0.00</span>
+          </li>
+          <hr class="mb-4">
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total (USD)</span>
+            <strong>$ <span id="myText"><%= totalSum %></span>.00<strong>
+          </li>
+        
+        </ul>  
+      </form>
+    </div>
+  </div>
+ <br>
+
+ <!-- Modal Hnadling crypto payment -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Payment Details </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Trigger when network bad -->
+        <button class="btn btn-primary" id="btnSpinner" type="button" disabled  >
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>
+          please wait ...
+        </button>
+        <div id="myDIV">
+          <p>This SELECT Dropdown list is filed using JSON data from an external file!</p>
+        
+          <select id="sel" onchange="show(this)">
+              <option value="">-- Select --</option>
+          </select>
+        
+          <p id="msg"></p>
+         </div>
+
+        <span>
+          <h6></h6>
+          <%= totalSum %>
+        </span>
+      </div>
+     
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Pay Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- nowpayments API -->
+<script>
+
+  // Get nowpayments API status 
+//  showing and hidding of button 
+
+let btnSpinner = document.getElementById('btnSpinner');
+let x = document.getElementById("myDIV");
+  btnSpinner.style.display = "none";
+let btnBuyCrypto = document.getElementById('crypto');
+
+let requestOptions = {
+  method: 'GET',
+  redirect: 'follow'
+};
+
+fetch("https://api.nowpayments.io/v1/status", requestOptions)
+  .then(response => response.text())
+  .then(result => {
+     if (result) {
+       btnBuyCrypto.addEventListener ('click', function (e) {
+        $('#myModal').modal('show');
+        console.log('nonpayment api status ', + result);
+
+        let key = "3P61C7P-RTG48D4-MMTT6XJ-CNS0WK9	 ";
+
+        //  Get available currencies
+
+          window.onload = populateSelect();
+
+          function populateSelect() {   
+
+              var xhr = new XMLHttpRequest(), 
+                  method = 'GET',
+                  overrideMimeType = 'application/json',
+                  url = 'https://api.nowpayments.io/v1/currencies';        // ADD THE URL OF THE FILE.
+                  //url = 'http://localhost:4000/DcryptoPay';
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                      
+                      // PARSE JSON DATA.
+                      var birds = JSON.parse(this.responseText);
+                      
+                      birds = birds.currencies;
+                      console.log('birds ' + birds);
+                      var ele = document.getElementById('sel');
+                      for (var i = 0; i < birds.length; i++) {
+                          // BIND DATA TO <select> ELEMENT.
+                            console.log('birds22222 ' + birds[i]);
+                          ele.innerHTML = ele.innerHTML +
+                              '<option value="' + birds[i] + '">' + birds[i] + '</option>';
+                      }
+                  }
+              };
+              xhr.open(method, url, true);
+              xhr.setRequestHeader("x-api-key", "3P61C7P-RTG48D4-MMTT6XJ-CNS0WK9");
+
+              xhr.send();
+          }
+          
+      })
+     }
+    
+  })
+  .catch(error =>  btnBuyCrypto.addEventListener('click', function (e) {
+   console.log('nowpayment api status error: ' + error);
+  
+   btnSpinner.style.display = "block";
+   myDIV.style.display = "none";
+  //  btnBuyCrypto.style.display = "none";
+   //pModal.style.display = "none";
+
+  }))
+
+  function show(ele) {
+
+    
+            let amt =3999.5000;
+            amt = amt;
+              amt  = parseFloat(amt);
+              console.log(typeof(amt));
+              let crypto = document.getElementById('sel').value;
+    
+          // GET THE SELECTED VALUE FROM <select> ELEMENT AND SHOW IT.
+          var msg = document.getElementById('msg');
+          msg.innerHTML = 'Selected Bird: <b>' + ele.options[ele.selectedIndex].text + '</b> </br>' +
+          'ID: <b>' + getEstimatePrice(amt , crypto ) + '</b>';
+        }
+  
+
+  function getEstimatePrice(amt, crypto) {
+  
+  //  let amt =3999.5000;
+  //  amt = amt;
+  //   amt  = parseFloat(amt);
+  //   console.log(typeof(amt));
+  //   let crypto = document.getElementById('sel').value;
+    
+    console.log(amt);
+    console.log(crypto);
+         
+    var myHeaders = new Headers();
+    myHeaders.append("x-api-key", "3P61C7P-RTG48D4-MMTT6XJ-CNS0WK9");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+fetch("https://api.nowpayments.io/v1/estimate?amount=3999.5000&currency_from=usd&currency_to=crypto", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result + '' + amt + '' + crypto))
+  .catch(error => console.log('error', error));
+  }
+
+</script>
+
+
+
+
+
+<%- include("../layouts/footer"); -%>

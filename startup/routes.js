@@ -1,51 +1,88 @@
 const express = require('express');
-const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
-const expressSession = require('express-session');
+const session = require('express-session');
 const connectMongo = require('connect-mongo');
 const connectFlash = require('connect-flash');
 const mongoose = require("mongoose");
 
+const { User }= require('../db/models/User');
 
-const posts = require('../routes/post');
-const login = require('../routes/login');
-const admin = require('../routes/admin');
-const logout = require('../routes/logout');
-const newpost = require('../routes/newpost');
-const updatePost = require('../routes/updatePost');
-const deletePost = require('../routes/deletePost');
-const register = require('../routes/register');
+const errorController = require('../controllers/error');
+
+const postRoutes = require('../routes/post');
+const adminRoutes = require('../routes/admin');
+const shopRoutes = require('../routes/shop');
+const authRoutes = require('../routes/auth');
+const userRouter = require('../routes/user');
 
 
 module.exports = function(app) {
+   
+    // linking the session with db.
+    const mongoStore = connectMongo(session);
 
-    
-    app.use(connectFlash());
-
-    const mongoStore = connectMongo(expressSession);
-    app.use(expressSession({ 
+    // initialize express-session to allow us track the logged-in user across sessions.
+    app.use(session({ 
         secret: 'keyboard cat',
-        //  resave: false,
-        //  saveUninitialized: true,
-        cookie: { maxAge: 60000 },
-        store: new mongoStore({mongooseConnection: mongoose.connection})
+        resave: false,
+        saveUninitialized: false,
+        cookie: { maxAge: 600000 },
+        store: new mongoStore({mongooseConnection: mongoose.connection, collection:'sessions'})
     }));
 
+    app.use(connectFlash());
 
-    app.use(fileUpload());
+    // middleware function to check for logged-in users
+    app.use((req, res, next) => {
+        res.locals.isAuthenticated = req.session.isLoggedIn;
+        res.locals.isAuthorised = req.session.isAdmin;
+       
+        next();
+    });
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use((req, res, next) => {
+        if(!req.session.user) {
+            console.log('notworking')
+            return next();
+        }
+        let tet = req.session.user._id;
+        User.findById(tet)
+            .then(user => {
+                if (!user) {
+                    return next();
+                }
+                req.user = user;
+                console.log(tet + 'kkkk')
+                next();
+            })
+            .catch(err => {
+                next(new Error(err));
+            });
+    });
+    
+    app.use(fileUpload({
+        createParentPath: true,
+        //tempFileDir : '/tmp/'
+    }));
 
+    //.use(fileUpload());
 
-    app.use('/', posts);
-    app.use('/auth/login', login);
-    app.use('/auth/register', register);
-    app.use('/auth/admin', admin);
-    app.use('/auth/newpost', newpost);
-    app.use('/auth/logout', logout);
-    app.use('/:id', posts);
-    app.use('/posts/update/', updatePost);
-    app.use('/posts/delete/', deletePost);
+    app.use(postRoutes);
+    app.use('/admin', adminRoutes);
+    app.use(shopRoutes);
+    app.use(authRoutes);
+    app.use('/user', userRouter);
+
+    //  app.get('/500', errorController.get500);
+    
+    // //handing invalid url(404)
+    // app.use((req, res, next) => {
+    //     res.render('page404');
+    // });
+
+    // //middleware handling 500 errors
+    // app.use((error, req, res, next) => {
+    //     res.redirect('/500');
+    // })
 
 }

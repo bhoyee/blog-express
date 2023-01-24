@@ -1,0 +1,137 @@
+<%- include("../layouts/header"); -%>
+<!-- Page Header -->
+<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="page-heading">
+            <h1>Cart</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+    <div class="container-fluid ">
+        <% if (products.length > 0) { %>
+        <div class="card shopping-cart">
+                 <div class="card-header bg-dark text-light">
+                     <i class="fa fa-shopping-cart mt-3" aria-hidden="true"></i>
+                    Shopping Cart
+                     <a href="/shop" class="btn btn-outline-info btn-sm pull-right">Continue shopping</a>
+                     <div class="clearfix"></div>
+                 </div>
+                 <div class="card-body">
+                         <!-- PRODUCT -->
+                    
+                         <div class="row">
+                            <% products.forEach(p => { %>
+                             <div class="col-12 col-sm-12 col-md-2 text-center mb-3">
+                                     <img class="img-responsive" src="/<%= p.productId.image %>" alt="prewiew" width="90" height="80">
+                             </div>
+                             <div class="col-12 text-sm-center col-sm-12 text-md-left col-md-6">
+                                 <h4 class="product-name"><strong><%= p.productId.title %></strong></h4>
+                                 <h4>
+                                     <small><%= p.productId.description%></small>
+                                 </h4>
+                             </div>
+                             <div class="col-12 col-sm-12 text-sm-center col-md-4 text-md-right row">
+                               
+                                 <div class="col-3 col-sm-3 col-md-6 text-md-right" style="padding-top: 5px">
+                                     <h6><strong>$<%= p.productId.price %><span class="text-muted ml-2">x</span></strong></h6>
+                                 </div>
+                                 <div class="col-4 col-sm-4 col-md-4">
+                                
+                                     <div class="quantity ">
+                                        <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()"
+                                        class="minus">-</button>
+                                         <input type="number"  step="1" max="99" min="1" value="<%= p.quantity %>" title="Qty" class="qty"
+                                                size="4">
+                                        <button onclick="this.parentNode.querySelector('input[type=number]').stepUp()"
+                                        class="plus">+</button>
+                                           
+
+
+                                     </div>
+                                    
+                                 </div>
+                                 <div class="col-2 col-sm-2 col-md-2 text-right">
+
+                                    <button class="btn btn-outline-danger btn-xs  mb-5" title="Delete" data-toggle="modal" data-target="#delete" >
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+
+                                 </div>
+                             </div>
+                              <!--Delete modal -->
+                            <div class="modal fade" id="delete">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h4 class="modal-title">Want to Delete?</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure to delete this cart?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form action="/cart-delete-item" method="POST">
+                                                <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                                                <button type="button" class="btn btn-outline-success" data-dismiss="modal">No</button>
+                                                <button class="btn btn-outline-danger btn-xs" >
+                                                    <i class="fa fa-trash" aria-hidden="true"></i> Yes
+                                                </button>
+                                            </form>
+                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end of Delete modal -->
+                         <% }) %>
+
+                         </div>
+                         <hr>
+                         <!-- END PRODUCT -->
+                       
+                     <div class="pull-right">
+                         <a href="" class="btn btn-outline-secondary pull-right">
+                             Update shopping cart
+                         </a>
+                     </div>
+                 </div>
+                 <div class="card-footer">
+                     <div class="coupon col-md-5 col-sm-5 no-padding-left pull-left">
+                         <div class="row">
+                             <div class="col-6">
+                                 <input type="text" class="form-control" placeholder="cupone code">
+                             </div>
+                             <div class="col-6">
+                                 <input type="submit" class="btn btn-outline-secondary btn-sm" >
+                             </div>
+                         </div>
+                     </div>
+                     <div class="pull-right" style="margin: 10px">
+                         <a href="/checkout" class="btn btn-success pull-right">Checkout</a>
+                         <div class="pull-right mr-5 mt-3">
+                             Total price: <b> <span> <%= totalPrice %> </span></b>
+                            
+                         </div>
+                         <!-- <form action="/create-order" method="POST">
+                       
+                        <button type="submit" class="btn">Order Now!</button>
+                    </form> -->
+                     </div>
+                 </div>
+
+      
+
+             </div>
+             <% } else { %>
+                <h1>No Products in Cart!</h1>
+            <% } %>
+     </div>
+
+<%- include("../layouts/footer"); -%>

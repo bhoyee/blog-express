@@ -1,4 +1,4 @@
-<%- include("layouts/header"); -%>
+<%- include("../layouts/header"); -%>
 <!-- Page Header -->
 <header class="masthead">
   <div class="overlay"></div>
@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         <div class="page-heading">
-          <h1>Create A New Account</h1>
+          <h1>Create A New Admin Account</h1>
         </div>
       </div>
     </div>
@@ -19,11 +19,17 @@
         <% if(errors.length > 0){ %>
             <ul>
                 <% errors.forEach(function(error){ %>
-                  <li class="list-group-item text-danger"><%= error%></li>
+                  <li class="list-group-item text-white text-center bg-danger"><%= error%></li>
                 
                 <% }); %>
             </ul>
+            <% } else { %>
+              <% errors.forEach(function(success){ %>
+              <li class="list-group-item text-success"><%= success %></li>
+              <% }); %>
+              
             <% } %>
+            
         <form action="/auth/register" method="POST" encType="multipart/form-data">
         <div class="control-group">
           <div class="form-group floating-label-form-group controls">
@@ -53,4 +59,4 @@
 </div>
 
 
-<%- include("layouts/footer"); -%>
+<%- include("../layouts/footer"); -%>

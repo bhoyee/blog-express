@@ -23,6 +23,13 @@
  
   <!-- Custom styles for this template -->
   <link href="/css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- custom styles for shop -->
+    <link rel="stylesheet" href="/css/shop.css">
+  
+   <!-- Rich text editor -->
+  <script src="https://cdn.ckeditor.com/4.9.1/full/ckeditor.js"></script>
+
 </head>
  
 <body>
@@ -40,12 +47,12 @@
           <ul class="navbar-nav ml-auto">
           
             
-            <% if(!name){ %>
+            <% if(!isAuthenticated){ %>
             <li class="nav-item">
               <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="#">Shop</a>
+            <a class="nav-link" href="/shop">Shop</a>
              </li>  
               <li class="nav-item">
               <a class="nav-link" href="/contact">Contact</a>
@@ -54,19 +61,35 @@
                 <a class="nav-link" href="/auth/login">Login</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/auth/register">Register</a>
+                <a class="nav-link" href="/auth/signup">Register</a>
               </li>
+              
+              <% } if (isAuthenticated && isAuthorised) { %>
+
+               
+                <li class="nav-item">
+                  <a class="nav-link" href="/admin/dashboard">Dashbaord</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/shop">Shop</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/auth/logout">Logout</a>
+                </li>
              
-            <% } else { %>
+            <% } else if (isAuthenticated) { %>
             <li class="nav-item">
-            <a class="nav-link" href="/auth/admin">Home</a>
+            <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="/auth/newpost">New Post</a>
-            </li>
+              <a class="nav-link" href="/user/dashboard">Dashboard</a>
+              </li>
             <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
-           </li>
+            <a class="nav-link" href="/shop">Shop</a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link btn btn-primary" href="/cart">Cart <i class="fa fa-shopping-cart" aria-hidden="true"></i> <span class="badge badge-light"><%= cart %></span></a>
+              </li>
             <li class="nav-item">
               <a class="nav-link" href="/auth/logout">Logout</a>
             </li>

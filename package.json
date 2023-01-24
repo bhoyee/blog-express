@@ -9,8 +9,11 @@
   "author": "bhoyee",
   "license": "MIT",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.2",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
+    "braintree": "^2.23.0",
+    "config": "^3.3.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^3.2.0",
     "edge.js": "^1.1.4",
@@ -19,7 +22,15 @@
     "express-edge": "^2.0.2",
     "express-fileupload": "^1.1.7-alpha.1",
     "express-session": "^1.17.0",
+    "express-validator": "^6.5.0",
+    "flutterwave-node": "^1.2.0",
+    "flutterwave-node-v3": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.19",
     "mongoose": "^5.9.7",
-    "startbootstrap-clean-blog": "^5.0.8"
+    "nodemailer": "^6.4.8",
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "pdfkit": "^0.11.0",
+    "startbootstrap-clean-blog": "^5.0.9"
   }
 }
